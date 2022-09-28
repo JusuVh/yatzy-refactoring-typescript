@@ -20,3 +20,5 @@ npm test
 ```bash
 npm run watch
 ```
+
+Refactored by Juhani

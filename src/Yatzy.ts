@@ -1,197 +1,127 @@
+
+type DieValue = 1 | 2 | 3 | 4 | 5 | 6;
+type DieStringValue = '1' | '2' | '3' | '4' | '5' | '6';
+
 export default class Yatzy {
-  private dice: number[];
+  private readonly dice: Array<DieValue>;
 
-  constructor(d1: number, d2: number, d3: number, d4: number, _5: number) {
-    this.dice = [];
-    this.dice[0] = d1;
-    this.dice[1] = d2;
-    this.dice[2] = d3;
-    this.dice[3] = d4;
-    this.dice[4] = _5;
+  constructor(d1: DieValue, d2: DieValue, d3: DieValue, d4: DieValue, d5: DieValue) {
+    this.dice = [d1, d2, d3, d4, d5];
   }
 
-  static chance(d1: number, d2: number, d3: number, d4: number, d5: number): number {
-    var total = 0;
-    total += d1;
-    total += d2;
-    total += d3;
-    total += d4;
-    total += d5;
-    return total;
+  chance(): number {
+    return this.dice.reduce((a, b) => a + b, 0);
   }
 
-  static yatzy(...args: number[]): number {
-    var counts = [0, 0, 0, 0, 0, 0, 0, 0];
-    for (var i = 0; i != args.length; ++i) {
-      var die = args[i];
-      counts[die - 1]++;
+  yatzy(): number {
+    // Si une seule valeur de dé existe => yatzy
+    if (new Set<DieValue>(this.dice).size === 1) {
+      return 50;
     }
-    for (i = 0; i != 6; i++) if (counts[i] == 5) return 50;
     return 0;
   }
 
-  static ones(d1: number, d2: number, d3: number, d4: number, d5: number): number {
-    var sum = 0;
-    if (d1 == 1) sum++;
-    if (d2 == 1) sum++;
-    if (d3 == 1) sum++;
-    if (d4 == 1) sum++;
-    if (d5 == 1) sum++;
-
-    return sum;
+  ones(): number {
+    return this.sumSingles(1);
   }
 
-  static twos(d1: number, d2: number, d3: number, d4: number, d5: number): number {
-    var sum = 0;
-    if (d1 == 2) sum += 2;
-    if (d2 == 2) sum += 2;
-    if (d3 == 2) sum += 2;
-    if (d4 == 2) sum += 2;
-    if (d5 == 2) sum += 2;
-    return sum;
+  twos(): number {
+    return this.sumSingles(2);
   }
 
-  static threes(d1: number, d2: number, d3: number, d4: number, d5: number): number {
-    var s;
-    s = 0;
-    if (d1 == 3) s += 3;
-    if (d2 == 3) s += 3;
-    if (d3 == 3) s += 3;
-    if (d4 == 3) s += 3;
-    if (d5 == 3) s += 3;
-    return s;
-  }
-
-  static score_pair(d1: number, d2: number, d3: number, d4: number, d5: number): number {
-    var counts = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-    counts[d1 - 1]++;
-    counts[d2 - 1]++;
-    counts[d3 - 1]++;
-    counts[d4 - 1]++;
-    counts[d5 - 1]++;
-    var at;
-    for (at = 0; at != 6; at++) if (counts[6 - at - 1] >= 2) return (6 - at) * 2;
-    return 0;
-  }
-
-  static two_pair(d1: number, d2: number, d3: number, d4: number, d5: number): number {
-    var counts = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-    counts[d1 - 1]++;
-    counts[d2 - 1]++;
-    counts[d3 - 1]++;
-    counts[d4 - 1]++;
-    counts[d5 - 1]++;
-    var n = 0;
-    var score = 0;
-    for (let i = 0; i < 6; i += 1)
-      if (counts[6 - i - 1] >= 2) {
-        n++;
-        score += 6 - i;
-      }
-    if (n == 2) return score * 2;
-    else return 0;
-  }
-
-  static four_of_a_kind(_1: number, _2: number, d3: number, d4: number, d5: number): number {
-    var tallies;
-    tallies = [0, 0, 0, 0, 0, 0, 0, 0];
-    tallies[_1 - 1]++;
-    tallies[_2 - 1]++;
-    tallies[d3 - 1]++;
-    tallies[d4 - 1]++;
-    tallies[d5 - 1]++;
-    for (let i = 0; i < 6; i++) if (tallies[i] >= 4) return (i + 1) * 4;
-    return 0;
-  }
-
-  static three_of_a_kind(d1: number, d2: number, d3: number, d4: number, d5: number): number {
-    var t;
-    t = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-    t[d1 - 1]++;
-    t[d2 - 1]++;
-    t[d3 - 1]++;
-    t[d4 - 1]++;
-    t[d5 - 1]++;
-    for (let i = 0; i < 6; i++) if (t[i] >= 3) return (i + 1) * 3;
-    return 0;
-  }
-
-  static smallStraight(d1: number, d2: number, d3: number, d4: number, d5: number): number {
-    var tallies;
-    tallies = [0, 0, 0, 0, 0, 0, 0];
-    tallies[d1 - 1] += 1;
-    tallies[d2 - 1] += 1;
-    tallies[d3 - 1] += 1;
-    tallies[d4 - 1] += 1;
-    tallies[d5 - 1] += 1;
-    if (tallies[0] == 1 && tallies[1] == 1 && tallies[2] == 1 && tallies[3] == 1 && tallies[4] == 1) return 15;
-    return 0;
-  }
-
-  static largeStraight(d1: number, d2: number, d3: number, d4: number, d5: number): number {
-    var tallies;
-    tallies = [0, 0, 0, 0, 0, 0, 0, 0];
-    tallies[d1 - 1] += 1;
-    tallies[d2 - 1] += 1;
-    tallies[d3 - 1] += 1;
-    tallies[d4 - 1] += 1;
-    tallies[d5 - 1] += 1;
-    if (tallies[1] == 1 && tallies[2] == 1 && tallies[3] == 1 && tallies[4] == 1 && tallies[5] == 1) return 20;
-    return 0;
-  }
-
-  static fullHouse(d1: number, d2: number, d3: number, d4: number, d5: number): number {
-    var tallies;
-    var _2 = false;
-    var i;
-    var _2_at = 0;
-    var _3 = false;
-    var _3_at = 0;
-
-    tallies = [0, 0, 0, 0, 0, 0, 0, 0];
-    tallies[d1 - 1] += 1;
-    tallies[d2 - 1] += 1;
-    tallies[d3 - 1] += 1;
-    tallies[d4 - 1] += 1;
-    tallies[d5 - 1] += 1;
-
-    for (i = 0; i != 6; i += 1)
-      if (tallies[i] == 2) {
-        _2 = true;
-        _2_at = i + 1;
-      }
-
-    for (i = 0; i != 6; i += 1)
-      if (tallies[i] == 3) {
-        _3 = true;
-        _3_at = i + 1;
-      }
-
-    if (_2 && _3) return _2_at * 2 + _3_at * 3;
-    else return 0;
+  threes(): number {
+    return this.sumSingles(3);
   }
 
   fours(): number {
-    var sum;
-    sum = 0;
-    for (let at = 0; at != 5; at++) {
-      if (this.dice[at] == 4) {
-        sum += 4;
-      }
-    }
-    return sum;
+    return this.sumSingles(4);
   }
 
   fives(): number {
-    let s = 0;
-    var i;
-    for (i = 0; i < this.dice.length; i++) if (this.dice[i] == 5) s = s + 5;
-    return s;
+    return this.sumSingles(5);
   }
 
   sixes(): number {
-    let sum = 0;
-    for (var at = 0; at < this.dice.length; at++) if (this.dice[at] == 6) sum = sum + 6;
-    return sum;
+    return this.sumSingles(6);
+  }
+
+  onePair(): number {
+    const pairArrayOrDefault0 = [0, ...this.getListOfDieCountGreaterThan(2)];
+    return Math.max(...pairArrayOrDefault0) * 2;
+  }
+
+  twoPairs(): number {
+    let dicePairsTotal = 0;
+    const pairArray = this.getListOfDieCountGreaterThan(2);
+
+    // Si deux paires existent, sommer la valeur des dés
+    if (pairArray.length === 2) {
+      dicePairsTotal = pairArray.reduce((a, b) => a + b, 0);
+    }
+    return dicePairsTotal * 2;
+  }
+
+  threeOfAKind(): number {
+    const threeOfAKindDie = this.getListOfDieCountGreaterThan(3)[0] || 0;
+    return threeOfAKindDie * 3;
+  }
+
+  fourOfAKind(): number {
+    const fourOfAKindDie = this.getListOfDieCountGreaterThan(4)[0] || 0;
+    return fourOfAKindDie * 4;
+  }
+
+  smallStraight(): number {
+    const uniqueDie = new Set(this.dice).size;
+    const maxDie = Math.max(...this.dice);
+    return uniqueDie === 5 && maxDie === 5 ? 15 : 0;
+  }
+
+  largeStraight(): number {
+    const uniqueDie = new Set(this.dice).size;
+    const minDie = Math.min(...this.dice);
+    return uniqueDie === 5 && minDie === 2 ? 20 : 0;
+  }
+
+  fullHouse(): number {
+    const pairArray = this.getListOfDieCountGreaterThan(2);
+    const threeOfAKindDie = this.getListOfDieCountGreaterThan(3)[0] || 0;
+
+    // S'il y a 2 paires et un triple => fullhouse
+    if(pairArray.length === 2 && threeOfAKindDie) {
+      return pairArray.filter(die => die !== threeOfAKindDie)[0] * 2 + threeOfAKindDie * 3;
+    }
+
+    return  0;
+  }
+
+  /**
+   * Somme uniquement les dés dont la valeur est égale à dieValue
+   * @param {DieValue} dieValue - valeur des dés à sommer
+   * @private
+   */
+  private sumSingles(dieValue: DieValue): number {
+    return this.dice.filter(die => die === dieValue).length * dieValue;
+  }
+
+  /**
+   * Transforme la liste de dés en objet qui map la valeur d'un dé avec son nombre d'occurence
+   * @private
+   */
+  private diceToValueMap(): {[key in DieStringValue]?: number} {
+    const returnObject: {[key in DieStringValue]?: number} = {};
+    this.dice.forEach(die => returnObject[die] = (returnObject[die] || 0) + 1)
+    return returnObject;
+  }
+
+  /**
+   * Récupérer la liste des dés dont le nombre d'occurence est supérieur à count
+   * @param {number} count - nombre d'occurence de dé à égaler ou dépasser
+   * @private
+   */
+  private getListOfDieCountGreaterThan(count: number): Array<DieValue> {
+    return Object.entries(this.diceToValueMap())
+                 .filter(([_, value]) => (value || 0) >= count)
+                 .map(([key, _]) => parseInt(key, 10) as DieValue)
   }
 }

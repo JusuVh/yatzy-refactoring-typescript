@@ -2,8 +2,8 @@
   "name": "yatzy-refactoring-kata",
   "version": "0.0.1",
   "author": {
-    "name": "Lorens León Parra",
-    "email": "lorensleon@gmail.org"
+    "name": "Juhani",
+    "email": "-"
   },
   "dependencies": {
     "@types/node": "*"
